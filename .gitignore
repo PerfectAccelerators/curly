@@ -1,3 +1,5 @@
+.DS_Store
+
 # Xcode
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
@@ -33,11 +35,16 @@ timeline.xctimeline
 playground.xcworkspace
 
 # Swift Package Manager
-#
-# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
-# Packages/
-# Package.pins
 .build/
+/.build
+/Packages
+Package.pins
+/*.xcodeproj
+buildlinux
+Package.swift.orig
+.packages_lin
+.build_lin
+*.log
 
 # CocoaPods
 #
