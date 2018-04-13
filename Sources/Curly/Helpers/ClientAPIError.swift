@@ -15,3 +15,17 @@ extension ClientAPIError {
                               success: false)
     }
 }
+
+
+/// For CodableRequest-style requests
+public protocol ClientAPIDefaultErrorResponseProtocol: Codable, Error {}
+
+public struct ClientAPIDefaultErrorResponse: ClientAPIDefaultErrorResponseProtocol {
+	public var error: ClientAPIDefaultErrorMsg?
+}
+public struct ClientAPIDefaultErrorMsg: Codable {
+	public var message: String?
+	public var type: String?
+	public var param: String?
+	public var code: String?
+}
