@@ -5,15 +5,17 @@ import PerfectCURL
 
 struct ClientAPIConfigHelper {
     
+    /// retrive api details from the model
     static func apiDetails<T: Codable>(_ serviceType: T.Type, apis: ClientAPIProtocol) -> ExternalAPI {
         /// **To discover the responseType**
         let mirror = Mirror(reflecting: serviceType)
         /// **Response Model Type**
         let modelType = String(describing: mirror.subjectType).replacingOccurrences(of: ".Type", with: "")
         /// **Resource configurations**
-        return apis.getResource(modelType)
+        return apis.resource(name: modelType)
     }
     
+    /// configure the curl request for the api
     static func curlRequest(for api: ExternalAPI,
                             url: String,
                             bearerToken: String) -> CURLRequest {

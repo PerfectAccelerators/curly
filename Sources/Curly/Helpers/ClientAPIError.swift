@@ -1,4 +1,5 @@
 
+/// In case of error this struct will be returned
 struct ClientAPIError: Error, Codable {
     var code: Int?
     var userFriendlyMessage: String?

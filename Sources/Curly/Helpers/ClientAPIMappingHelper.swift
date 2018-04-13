@@ -4,6 +4,7 @@ import PerfectCURL
 import PerfectLogger
 import Foundation
 
+/// Helper methods to handle the mapping of the response to Codable
 struct ClientAPIMappingHelper {
     
     static func processResponse<T: Codable>(_ responseType: T.Type,
@@ -55,7 +56,7 @@ struct ClientAPIMappingHelper {
                 let model = try decoder.decode(ClientAPIError.self, from: jsonData)
                 completion(nil, model)
             }
-            LogFile.error("responseCode: \(resp.responseCode) - error json: \(resp.bodyString) - responseType:\(responseType) ")
+            LogFile.info("responseCode: \(resp.responseCode) -  json: \n\(resp.bodyString) - responseType:\(responseType) ")
         } catch let error as CURLResponse.Error {
             let err = error.response
             let httpError = ClientAPIError(code: err.responseCode,

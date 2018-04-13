@@ -1,17 +1,32 @@
 
 import Foundation
 
-protocol ClientRestProtocol {
+/// Conveience protocol with default implementation
+/// to consume (GET) and produce (POST)
+///
+/// - Define all your API dependecies in a struct that conforms to `ClientAPIProtocol`.
+/// - Create a struct that conforms to `ClientRestProtocol`
+/// - Set `ExternalServices` with the defined struct
+/// - Fianlly, set the model types for POST and GET
+public protocol ClientRestProtocol {
+    associatedtype ExternalServices: ClientAPIProtocol
     associatedtype PostModelType: Codable
     associatedtype GetModelType: Codable
     associatedtype PostResponseType: Codable
 }
 
 extension ClientRestProtocol {
-    static func consume(with: [String: Any],
-                        completion: @escaping (GetModelType?, Error?) -> Void) {
+    
+    /* Example usage
+     let params: [String: Any] = ["bar": "foo"]
+     HttpbinService.consume(with: params) { (response, error) in
+        print("\(String(describing: response))")
+     }
+     */
+    public static func consume(with: [String: Any],
+                               completion: @escaping (GetModelType?, Error?) -> Void) {
         
-        let httpClient = HttpClient(ExternalServices())
+        let httpClient = HttpClient(ExternalServices.init())
         httpClient.request(with: with,
                            for: GetModelType.self) {
                             
@@ -26,10 +41,10 @@ extension ClientRestProtocol {
         }
     }
     
-    static func produce(with: PostModelType,
-                        completion: @escaping (PostResponseType?, Error?) -> Void) {
+    public static func produce(with: PostModelType,
+                               completion: @escaping (PostResponseType?, Error?) -> Void) {
         
-        let httpClient = HttpClient(ExternalServices())
+        let httpClient = HttpClient(ExternalServices.init())
         httpClient.request(with: with,
                            for: PostResponseType.self) {
                             

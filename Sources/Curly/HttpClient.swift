@@ -5,6 +5,12 @@ import PerfectHTTP
 import Foundation
 import Dispatch
 
+/// Http Client to send requests to external APIs.
+/// It relies on a concerte object conforiming to `ClientAPIProtocol`.
+///
+/// **Client of this struct needs to implement the protocol and
+/// inject it via init**
+
 struct HttpClient {
     
     // MARK: - Dependency Injection
@@ -21,7 +27,7 @@ struct HttpClient {
     // MARK: - GET Request
     
     /// Send a request - Async - with params
-    /// This method can be used for GET requests to external APIs
+    /// This method can be used for **GET** requests to external APIs
     /// - Parameter params: GET request parameters
     /// - Parameter responseType: expected response type
     /// - Parameter completion: Closure as the completion handler
@@ -32,14 +38,12 @@ struct HttpClient {
                              for responseType: V.Type,
                              completion: @escaping (_ response: V?, _ error: Error?) -> Void) {
         
-        // configure the request
+        // configure the request by getting the API details
         let api = ClientAPIConfigHelper.apiDetails(responseType, apis: self.clientAPIs)
         var parameteredURL = "\(api.url)"
         switch api.httpMethod {
         case .post:
-            for (_, value) in params {
-                parameteredURL.append("/\(value)")
-            }
+            break
         case .get:
             if api.paramFormat == .valueOnly {
                 for (_, value) in params {
@@ -49,11 +53,19 @@ struct HttpClient {
                 for (key, value) in params {
                     parameteredURL.append("/\(key)/\(value)")
                 }
+            } else if api.paramFormat == .urlEncoding {
+                parameteredURL.append("?")
+                var index = 0
+                for (key, value) in params {
+                    parameteredURL.append("\(key)=\(value)")
+                    index += 1
+                    if index < params.count {
+                        parameteredURL.append("&")
+                    }
+                }
             }
         default:
-            for (_, value) in params {
-                parameteredURL.append("/\(value)")
-            }
+            break
         }
         
         let curlRequest = ClientAPIConfigHelper.curlRequest(for: api,
@@ -69,7 +81,7 @@ struct HttpClient {
     // MARK: - POST Request
     
     /// Send a request - Async - with requestModel
-    /// This method can be used to make POST requests to external APIs
+    /// This method can be used to make **POST** requests to external APIs
     /// - Parameter requestModel: POST request model
     /// - Parameter responseType: expected response type
     /// - Parameter completion: closure as the completion handler
@@ -79,7 +91,7 @@ struct HttpClient {
                                          for responseType: V.Type,
                                          completion: @escaping (_ response: V?, _ error: Error?) -> Void) {
         
-        // configure the request
+        // configure the request by getting the API details
         let api = ClientAPIConfigHelper.apiDetails(responseType, apis: self.clientAPIs)
 
         var curlRequest = CURLRequest(api.url)
