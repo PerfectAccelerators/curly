@@ -14,32 +14,26 @@ final class CurlyTests: XCTestCase {
 
         httpClient.request(with: params,
                            for: Httpbin.self) { (response, error) in
-                            print("\(String(describing: response))")
+                            // print("\(String(describing: response))")
                             expec.fulfill()
         }
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 2, handler: nil)
     }
     
     func testClientRestProtocol() {
         let params: [String: Any] = ["bar": "foo"]
         let expec = expectation(description: "GET Results via Client REST protocol")
         HttpbinService.consume(with: params) { (response, error) in
-            print("\(String(describing: response))")
+            // print("\(String(describing: response))")
             expec.fulfill()
         }
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 2, handler: nil)
         
-    }
-    
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        //XCTAssertEqual(Curly().text, "Hello, World!")
     }
 
 
     static var allTests = [
-        ("testExample", testExample),
+		("testGETRequest", testGETRequest),
+		("testClientRestProtocol", testClientRestProtocol),
     ]
 }
