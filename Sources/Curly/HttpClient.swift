@@ -130,10 +130,6 @@ public struct HttpClient {
         }
     }
 
-
-
-
-
 	/// The function that triggers the specific interaction with a remote server
 	/// Parameters:
 	/// - method: The HTTP Method enum, i.e. .get, .post
