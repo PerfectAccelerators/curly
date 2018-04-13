@@ -32,10 +32,10 @@ extension ClientRestProtocol {
                             
                             (response, error) in
                             if let result = response {
-                                print("response: \(result)")
+                               // print("response: \(result)")
                                 completion(result, nil)
                             } else if let failure = error {
-                                print("error:\(failure)")
+                                // print("error:\(failure)")
                                 completion(nil, failure)
                             }
         }
@@ -50,10 +50,10 @@ extension ClientRestProtocol {
                             
                             (response, error) in
                             if let result = response {
-                                print("response: \(result)")
+                                // print("response: \(result)")
                                 completion(result, nil)
                             } else if let failure = error {
-                                print("error:\(failure)")
+                                // print("error:\(failure)")
                                 completion(nil, failure)
                             }
         }
