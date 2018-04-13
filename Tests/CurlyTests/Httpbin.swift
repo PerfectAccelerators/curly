@@ -3,7 +3,11 @@ import Foundation
 
 struct Httpbin: Codable {
     let args: Args?
+	var data: String?
+	var files: Args?
+	var form: Args?
     let headers: Headers
+	var json: Args?
     let origin: String
     let url: String
 }
@@ -15,6 +19,8 @@ struct Headers: Codable {
     let acceptEncoding: String?
     let acceptLanguage: String?
     let connection: String?
+	var contentType: String?
+	var dnt: String?
     let cookie: String?
     let host: String?
     let referer: String?
@@ -26,6 +32,8 @@ struct Headers: Codable {
         case acceptEncoding = "Accept-Encoding"
         case acceptLanguage = "Accept-Language"
         case connection = "Connection"
+		case contentType = "Content-Type"
+		case dnt = "Dnt"
         case cookie = "Cookie"
         case host = "Host"
         case referer = "Referer"
