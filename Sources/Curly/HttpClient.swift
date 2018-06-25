@@ -28,7 +28,8 @@ public struct HttpClient {
     
     /// Send a request - Async - with params
     /// This method can be used for **GET** requests to external APIs
-    /// - Parameter params: GET request parameters
+    /// - Parameter params: GET request parameters **CAUTION** for api with `.valueOnly` or `.keyValuePair`, the route api could be unexpected sorted.,
+    ///   i.e., ["route1": "one", "route2": "two"] may result in /route2/two/route1/one, depends on the internal NSDictionary key arrangement structure.
     /// - Parameter responseType: expected response type
     /// - Parameter completion: Closure as the completion handler
     /// - Parameter response: mapped model ready to use
@@ -46,23 +47,20 @@ public struct HttpClient {
             break
         case .get:
             if api.paramFormat == .valueOnly {
-                for (_, value) in params {
-                    parameteredURL.append("/\(value)")
-                }
+                let path:[String] = params.map { "/" + "\($0.value)".stringByEncodingURL }
+                parameteredURL.append(path.joined())
             } else if api.paramFormat == .keyValuePair {
-                for (key, value) in params {
-                    parameteredURL.append("/\(key)/\(value)")
+                let path:[String] = params.map {
+                    "/" + $0.key.stringByEncodingURL +
+                    "/" + "\($0.value)".stringByEncodingURL 
                 }
+                parameteredURL.append(path.joined())
             } else if api.paramFormat == .urlEncoding {
-                parameteredURL.append("?")
-                var index = 0
-                for (key, value) in params {
-                    parameteredURL.append("\(key)=\(value)")
-                    index += 1
-                    if index < params.count {
-                        parameteredURL.append("&")
-                    }
+                let path:[String] = params.map {
+                    $0.key.stringByEncodingURL +
+                    "=" + "\($0.value)".stringByEncodingURL 
                 }
+                parameteredURL.append("?" + path.joined(separator: "&"))
             }
         default:
             break
