@@ -39,6 +39,7 @@ playground.xcworkspace
 /.build
 /Packages
 Package.pins
+*.resolved
 /*.xcodeproj
 buildlinux
 Package.swift.orig

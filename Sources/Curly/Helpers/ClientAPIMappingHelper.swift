@@ -21,7 +21,6 @@ struct ClientAPIMappingHelper {
         } catch let error as CURLResponse.Error {
             let err = error.response
             self.parseResponse(err, responseType, false, completion)
-//            LogFile.debug("responseCode: \(err.responseCode) - json: \(err.bodyString) - responseType:\(responseType) ")
         } catch let error {
             LogFile.critical("CURL GET request perform error")
             let httpError = ClientAPIError(code: 500,
@@ -56,7 +55,6 @@ struct ClientAPIMappingHelper {
                 let model = try decoder.decode(ClientAPIError.self, from: jsonData)
                 completion(nil, model)
             }
-            // LogFile.info("responseCode: \(resp.responseCode) -  json: \n\(resp.bodyString) - responseType:\(responseType) ")
         } catch let error as CURLResponse.Error {
             let err = error.response
             let httpError = ClientAPIError(code: err.responseCode,
