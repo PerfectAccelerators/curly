@@ -222,6 +222,85 @@ public struct HttpClient {
 		}
 	}
 
+	// Simpler non-typed object version. Will use the same error methodology, but instead of using a codable conversion, will just respond with a [String: Any]. Useful in cases where one does not know the structure of what is going to be returned.
+	public static func request<E: ClientAPIDefaultErrorResponseProtocol>(
+		_ method: HTTPMethod,
+		_ url: String,
+		error errorType: E.Type,
+		body: String = "",
+		json: [String: Any] = [String: Any](),
+		params: [String: Any] = [String: Any](),
+		headers: [String: Any] = [String: Any](), // additional headers. use to override things like weird auth formats
+		encoding: String = "json",
+		bearerToken: String = "") throws -> [String: Any] {
+
+		var curlObject = CURLRequest(url, options: [CURLRequest.Option.httpMethod(method)])
+		var byteArray = [UInt8]()
+
+		if !body.isEmpty {
+			print(body.utf8)
+			byteArray = [UInt8](body.utf8)
+		} else if !json.isEmpty {
+			do {
+				print(try json.jsonEncodedString().utf8)
+				byteArray = [UInt8](try json.jsonEncodedString().utf8)
+			} catch {
+				throw error
+			}
+		} else if !params.isEmpty {
+			byteArray = [UInt8]((self.toParams(params).joined(separator: "&")).utf8)
+		}
+
+
+		if method == .post || method == .put || method == .patch {
+			curlObject = CURLRequest(url, CURLRequest.Option.httpMethod(method), .postData(byteArray))
+		} else {
+			curlObject = CURLRequest(url, CURLRequest.Option.httpMethod(method))
+		}
+
+
+		curlObject.addHeader(.accept, value: "application/json")
+		curlObject.addHeader(.cacheControl, value: "no-cache")
+		curlObject.addHeader(.userAgent, value: "PerfectCodableRequest1.0")
+
+		for (i,v) in headers {
+			curlObject.addHeader(.custom(name: i), value: "\(v)")
+		}
+
+
+		if !bearerToken.isEmpty {
+			curlObject.addHeader(.authorization, value: "Bearer \(bearerToken)")
+		}
+
+		if encoding == "json" {
+			curlObject.addHeader(.contentType, value: "application/json")
+		} else {
+			curlObject.addHeader(.contentType, value: "application/x-www-form-urlencoded")
+		}
+
+		do {
+			let response = try curlObject.perform()
+			if response.responseCode >= 400 {
+				do {
+					let e = try response.bodyJSON(errorType)
+					throw e
+
+				} catch {
+					let e = ClientAPIDefaultErrorResponse(error: ClientAPIDefaultErrorMsg(message: response.bodyString, type: "", param: "", code: "\(response.responseCode)"))
+					throw e
+				}
+			}
+			let model = try UTF8Encoding.encode(bytes: response.bodyBytes).jsonDecode() as? [String:Any] ?? [:]
+			return model
+
+		} catch let error as CURLResponse.Error {
+			let e = try error.response.bodyJSON(errorType)
+			throw e
+
+		} catch {
+			throw error
+		}
+	}
 	private static func toParams(_ params:[String: Any]) -> [String] {
 		var str = [String]()
 		for (key, value) in params {
