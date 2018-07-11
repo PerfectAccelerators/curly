@@ -238,11 +238,9 @@ public struct HttpClient {
 		var byteArray = [UInt8]()
 
 		if !body.isEmpty {
-			print(body.utf8)
 			byteArray = [UInt8](body.utf8)
 		} else if !json.isEmpty {
 			do {
-				print(try json.jsonEncodedString().utf8)
 				byteArray = [UInt8](try json.jsonEncodedString().utf8)
 			} catch {
 				throw error
@@ -267,7 +265,6 @@ public struct HttpClient {
 			curlObject.addHeader(.custom(name: i), value: "\(v)")
 		}
 
-
 		if !bearerToken.isEmpty {
 			curlObject.addHeader(.authorization, value: "Bearer \(bearerToken)")
 		}
@@ -290,8 +287,12 @@ public struct HttpClient {
 					throw e
 				}
 			}
-			let model = try UTF8Encoding.encode(bytes: response.bodyBytes).jsonDecode() as? [String:Any] ?? [:]
-			return model
+			if response.bodyString.isEmpty {
+				return [String: Any]()
+			} else {
+				let model = try UTF8Encoding.encode(bytes: response.bodyBytes).jsonDecode() as? [String: Any] ?? [:]
+				return model
+			}
 
 		} catch let error as CURLResponse.Error {
 			let e = try error.response.bodyJSON(errorType)
